@@ -22,6 +22,6 @@ Finally, run it with Python3! :checkered_flag:
 
 ## Nota Bene
 
-Three types of domains are available, and those marked as **inactive** are cheapest and affordable. :shopping_bags:
+Three types of domains are available, and those marked as **inactive** are cheapest and affordable. :joy:
 
 For the **premium** domains, HTTP GET request to endpoint like `https://domainsearch.namecheapapi.com/domain/note.host` will tell you the price in USD. :dollar:
