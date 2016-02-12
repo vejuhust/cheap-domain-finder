@@ -6,7 +6,8 @@ from requests import get, codes
 from urllib import parse
 from json import loads, dump
 
-keywords = [ "pad", "draft", "drafts", "notepad", "text", "sketch", "memo", "editor" ]
+
+keywords = [ "pad", "draft", "drafts", "notepad", "text", "sketch", "memo", "editor", "vim", "code", "note", "git", "github" ]
 page_url = "https://www.namecheap.com/domains/registration/results.aspx?domain=%s"
 api_batch_url = "https://api.domainr.com/v2/status?client_id=%s&domain=%s"
 retry_times = 3
@@ -93,7 +94,8 @@ def query_all_domains(keyword):
     return domains
 
 
-for keyword in keywords:
-    domains = query_all_domains(keyword)
-    with open("domains-" + keyword + ".json", 'w') as file:
-        dump(domains, file, sort_keys = True, indent = 2, ensure_ascii = False)
+if __name__ == '__main__':
+    for keyword in keywords:
+        domains = query_all_domains(keyword)
+        with open("domains-" + keyword + ".json", 'w') as file:
+            dump(domains, file, sort_keys = True, indent = 2, ensure_ascii = False)
