@@ -6,7 +6,7 @@ from requests import get, codes
 from urllib import parse
 from json import loads, dump
 
-keyword = "note"
+keyword = "code"
 page_url = "https://www.namecheap.com/domains/registration/results.aspx?domain=%s"
 api_batch_url = "https://api.domainr.com/v2/status?client_id=%s&domain=%s"
 retry_times = 3
@@ -86,5 +86,5 @@ for tlds in tld_sublist:
                 domains[domain] = summary
                 print(domain, summary)
 
-with open("domains.json", 'w') as file:
+with open("domains-" + keyword + ".json", 'w') as file:
     dump(domains, file, sort_keys = True, indent = 2, ensure_ascii = False)
