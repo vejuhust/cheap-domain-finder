@@ -1,2 +1,3 @@
-# cheap-domain-finder
-Cheap Domain Finder: A Python Helper for https://www.namecheap.com/
+# Cheap Domain Finder
+
+A Python helper to find cheap domains faster on [namecheap.com](https://www.namecheap.com/)
