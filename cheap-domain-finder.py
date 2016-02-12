@@ -6,7 +6,7 @@ from requests import get, codes
 from urllib import parse
 from json import loads, dump
 
-keyword = "code"
+keywords = [ "pad", "draft", "drafts", "notepad", "text", "sketch", "memo", "editor" ]
 page_url = "https://www.namecheap.com/domains/registration/results.aspx?domain=%s"
 api_batch_url = "https://api.domainr.com/v2/status?client_id=%s&domain=%s"
 retry_times = 3
@@ -23,7 +23,7 @@ def fetch_page(url):
         pass
 
 
-def retrieve_content(retry_times):
+def retrieve_content(keyword, retry_times):
     url = page_url % keyword
     while retry_times > 0:
         content = fetch_page(url)
@@ -57,7 +57,7 @@ def parse_client_id(page_soup):
         return None
 
 
-def query_batch(client_id, batch_list, retry_times):
+def query_batch(client_id, keyword, batch_list, retry_times):
     query_list = [ keyword + "." + tld for tld in batch_list ]
     query_string = parse.quote(",".join(query_list))
     url = api_batch_url % (client_id, query_string)
@@ -72,8 +72,8 @@ def query_batch(client_id, batch_list, retry_times):
     return None
 
 
-def query_all_domains():
-    page_soup = retrieve_content(retry_times)
+def query_all_domains(keyword):
+    page_soup = retrieve_content(keyword, retry_times)
     if page_soup == None:
         return None
     client_id = parse_client_id(page_soup)
@@ -82,7 +82,7 @@ def query_all_domains():
     domains = {}
     tld_sublist = [ tld_list[x : x+domain_per_query] for x in range(0, len(tld_list), domain_per_query) ]
     for tlds in tld_sublist:
-        result = query_batch(client_id, tlds, retry_times)
+        result = query_batch(client_id, keyword, tlds, retry_times)
         for item in result["status"]:
             summary = item["summary"]
             domain = item["domain"]
@@ -93,6 +93,7 @@ def query_all_domains():
     return domains
 
 
-domains = query_all_domains()
-with open("domains-" + keyword + ".json", 'w') as file:
-    dump(domains, file, sort_keys = True, indent = 2, ensure_ascii = False)
+for keyword in keywords:
+    domains = query_all_domains(keyword)
+    with open("domains-" + keyword + ".json", 'w') as file:
+        dump(domains, file, sort_keys = True, indent = 2, ensure_ascii = False)
