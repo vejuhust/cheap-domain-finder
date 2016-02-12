@@ -27,12 +27,13 @@ def retrieve_content(retry_times):
     url = page_url % keyword
     while retry_times > 0:
         content = fetch_page(url)
-        if content == None:
-            content = ""
-            retry_times -= 1
-        else:
-            retry_times = 0
-    return BeautifulSoup(content, "html5lib")
+        retry_times -= 1
+        if content != None:
+            try:
+                return BeautifulSoup(content, "html5lib")
+            except Exception as e:
+                pass
+    return None
 
 
 def parse_tld_list(page_soup):
@@ -62,29 +63,36 @@ def query_batch(client_id, batch_list, retry_times):
     url = api_batch_url % (client_id, query_string)
     while retry_times > 0:
         content = fetch_page(url)
-        if content == None:
-            content = ""
-            retry_times -= 1
-        else:
-            retry_times = 0
-    return loads(content)
+        retry_times -= 1
+        if content != None:
+            try:
+                return loads(content)
+            except Exception as e:
+                pass
+    return None
 
 
-page_soup = retrieve_content(retry_times)
-client_id = parse_client_id(page_soup)
-tld_list = parse_tld_list(page_soup)
+def query_all_domains():
+    page_soup = retrieve_content(retry_times)
+    if page_soup == None:
+        return None
+    client_id = parse_client_id(page_soup)
+    tld_list = parse_tld_list(page_soup)
 
-domains = {}
-tld_sublist = [ tld_list[x : x+domain_per_query] for x in range(0, len(tld_list), domain_per_query) ]
-for tlds in tld_sublist:
-    result = query_batch(client_id, tlds, retry_times)
-    for item in result["status"]:
-        summary = item["summary"]
-        domain = item["domain"]
-        if summary in ["premium", "reserved", "inactive"]:
-            if domain not in domains:
-                domains[domain] = summary
-                print(domain, summary)
+    domains = {}
+    tld_sublist = [ tld_list[x : x+domain_per_query] for x in range(0, len(tld_list), domain_per_query) ]
+    for tlds in tld_sublist:
+        result = query_batch(client_id, tlds, retry_times)
+        for item in result["status"]:
+            summary = item["summary"]
+            domain = item["domain"]
+            if summary in ["premium", "reserved", "inactive"]:
+                if domain not in domains:
+                    domains[domain] = summary
+                    print(domain, summary)
+    return domains
 
+
+domains = query_all_domains()
 with open("domains-" + keyword + ".json", 'w') as file:
     dump(domains, file, sort_keys = True, indent = 2, ensure_ascii = False)
